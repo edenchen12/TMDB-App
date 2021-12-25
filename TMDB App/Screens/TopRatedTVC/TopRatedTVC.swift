@@ -71,19 +71,21 @@ class TopRatedTVC: UITableViewController {
         
     }
     
-    
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let height = scrollView.frame.size.height
-        let contentYoffset = scrollView.contentOffset.y
-        let distanceFromBottom = scrollView.contentSize.height - contentYoffset
-        if distanceFromBottom < height {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let lastSectionIndex = tableView.numberOfSections - 1
+        let lastRowIndex = tableView.numberOfRows(inSection: lastSectionIndex) - 1
+        if indexPath.section ==  lastSectionIndex && indexPath.row == lastRowIndex {
             if viewModel.isLoading == false {
+                viewModel.startLoading(view: tableView)
+                tableView.isUserInteractionEnabled = false
                 NetworkManager.shared.page += 1
                 viewModel.getNextPageOfMovies(methodRoot: getTopRatedRoot, tableView: tableView)
+                movies += viewModel.movies
                 
                 DispatchQueue.main.async { [self] in
-                    movies += viewModel.movies
-                    self.tableView.reloadData()
+                    viewModel.stopLoading()
+                    tableView.isUserInteractionEnabled = true
+                    tableView.reloadData()
                 }
             }
         }

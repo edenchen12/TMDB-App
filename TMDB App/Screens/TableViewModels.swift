@@ -15,26 +15,22 @@ class TableViewModels {
     
     var isLoading = false
     let activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
-    
+
     func setTableView(tableView: UITableView) {
-        
         tableView.register(UINib(nibName: "MovieTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 80
-        
     }
     
     
     func getMoviesToView(methodRoot: String, tableView: UITableView) {
-        networkManager.page = 0
-        isLoading = true
-        startLoading(scrollView: tableView)
+        networkManager.page = 1
         NetworkManager.shared.getMovies(urlString: methodRoot, page: networkManager.page) { result in
             DispatchQueue.main.async { [self] in
                 switch result {
                 case .success(let movies):
                     self.movies = movies
-                   
+                    
                 case .failure(let error):
                     
                     switch error {
@@ -48,8 +44,6 @@ class TableViewModels {
                         print(error.localizedDescription)
                     }
                 }
-                isLoading = false
-                stopLoading()
                 tableView.reloadData()
             }
         }
@@ -57,8 +51,7 @@ class TableViewModels {
     
     
     func getNextPageOfMovies(methodRoot: String, tableView: UITableView) {
-        isLoading = true
-        startLoading(scrollView: tableView)
+        
         NetworkManager.shared.getMovies(urlString: methodRoot, page: networkManager.page) { result in
             DispatchQueue.main.async { [self] in
                 
@@ -79,9 +72,8 @@ class TableViewModels {
                         print(error.localizedDescription)
                     }
                 }
-                isLoading = false
-                stopLoading()
                 tableView.reloadData()
+
             }
         }
     }
@@ -91,22 +83,24 @@ class TableViewModels {
         networkManager.downloadImage(from: urlString)
     }
     
-    
-    func startLoading(scrollView: UIScrollView)  {
+    func startLoading(view: UIView)  {
         
+        isLoading = true
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.center = scrollView.center
-        activityIndicator.color = .gray
+        activityIndicator.center =  CGPoint(x:UIScreen.main.bounds.size.width / 2, y:UIScreen.main.bounds.size.height / 2)
+        if let superView = view.superview {
+            superView.addSubview(activityIndicator)
+        }
         
         activityIndicator.startAnimating()
-        scrollView.addSubview(activityIndicator)
+
         
     }
     
     func stopLoading() {
         
-        self.isLoading = false
-        self.activityIndicator.stopAnimating()
+        isLoading = false
+        activityIndicator.stopAnimating()
         
     }
     
