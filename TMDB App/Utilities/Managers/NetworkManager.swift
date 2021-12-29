@@ -17,6 +17,12 @@ class NetworkManager {
     let cache = NSCache<NSString, UIImage>()
     var image = UIImage()
     
+    
+    //dudi
+    //try to make it generic and not a singelton, instead use protocol based network service & inject it to the vc that needs it on init.
+    //the network manager should only send the request(any request) and give the results to the caller.
+    //network should not hold the page/image etc...
+    
     static let shared = NetworkManager()
 	
 	enum NetworkError: String, Error {
@@ -26,7 +32,7 @@ class NetworkManager {
 		case unableToComplete = "Something went wrong please try again"
 	}
 	
-    func getMovies(urlString requestedMethod: String, page: Int, completed: @escaping (Result<[MovieModel], NetworkError>) -> Void) {
+    func getMovies(urlString requestedMethod: String, page: Int, completed: @escaping (Result<[TMDBMovie], NetworkError>) -> Void) {
 		
         
         let endPoint = baseURL + requestedMethod + apiKey + pageURL + "\(page)"
@@ -56,7 +62,7 @@ class NetworkManager {
 			do {
 				let decoder = JSONDecoder()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
-				let decodedData = try decoder.decode(MoviesModel.self, from: data)
+				let decodedData = try decoder.decode(TMDBResponse.self, from: data)
 				completed(.success(decodedData.results))
 			} catch {
 				completed(.failure(.unableToComplete))

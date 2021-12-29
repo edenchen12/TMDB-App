@@ -13,7 +13,7 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var posterImage: UIImageView!
     @IBOutlet weak var descriptionLabel: UILabel!
     
-    var selectedMovie: MovieModel?
+    var selectedMovie: TMDBMovie?
     override func viewDidLoad() {
         super.viewDidLoad()
         

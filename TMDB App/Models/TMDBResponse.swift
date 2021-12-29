@@ -7,15 +7,15 @@
 
 import Foundation
 
-struct MoviesModel: Decodable {
+struct TMDBResponse: Codable {
 	let page: Int
-	let results: [MovieModel]
+	let results: [TMDBMovie]
 }
 
-struct MovieModel: Decodable {
+struct TMDBMovie: Codable {
 	
 	let id: Int
-	var title: String
+	let title: String
 	let posterPath: String
     let overview: String
 	

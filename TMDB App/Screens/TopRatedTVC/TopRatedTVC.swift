@@ -7,12 +7,14 @@
 
 import UIKit
 
+//dudi
+//remove storyboard and use only XIB
+//create a class that controll the flow from screen to screen
+
 class TopRatedTVC: UITableViewController {
-    
-    let getTopRatedRoot = "top_rated?api_key="
-    
-    var selectedMovie: MovieModel?
-    var movies: [MovieModel] = []
+        
+    var selectedMovie: TMDBMovie?
+    var movies: [TMDBMovie] = []
     
     let viewModel = TableViewModels()
     
@@ -24,7 +26,7 @@ class TopRatedTVC: UITableViewController {
         
         viewModel.setTableView(tableView: tableView)
         
-        viewModel.getMoviesToView(methodRoot: getTopRatedRoot, tableView: tableView)
+        viewModel.getMoviesToView(tableView: tableView, endpoint: TMDBEndpoint.getTopRatedMovies(page: viewModel.page))
         movies = viewModel.movies
     }
     
@@ -77,14 +79,12 @@ class TopRatedTVC: UITableViewController {
         if indexPath.section ==  lastSectionIndex && indexPath.row == lastRowIndex {
             if viewModel.isLoading == false {
                 viewModel.startLoading(view: tableView)
-                tableView.isUserInteractionEnabled = false
-                NetworkManager.shared.page += 1
-                viewModel.getNextPageOfMovies(methodRoot: getTopRatedRoot, tableView: tableView)
+                viewModel.page += 1
+                viewModel.getNextPageOfMovies(tableView: tableView, endpoint: TMDBEndpoint.getTopRatedMovies(page: viewModel.page))
                 movies += viewModel.movies
                 
                 DispatchQueue.main.async { [self] in
                     viewModel.stopLoading()
-                    tableView.isUserInteractionEnabled = true
                     tableView.reloadData()
                 }
             }

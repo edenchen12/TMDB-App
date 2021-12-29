@@ -10,10 +10,9 @@ import UIKit
 class NowPlayingTVC: UITableViewController {
     
     
-    let getNowPlayingRoot = "now_playing?api_key="
     
-    var selectedMovie: MovieModel?
-    var movies: [MovieModel] = []
+    var selectedMovie: TMDBMovie?
+    var movies: [TMDBMovie] = []
     
     let viewModel = TableViewModels()
     
@@ -23,7 +22,7 @@ class NowPlayingTVC: UITableViewController {
         
         navigationItem.title = "Now Playing"
         viewModel.setTableView(tableView: tableView)
-        viewModel.getMoviesToView(methodRoot: getNowPlayingRoot, tableView: tableView)
+        viewModel.getMoviesToView(tableView: tableView, endpoint: TMDBEndpoint.getNowPlayingMovies(page: viewModel.page))
         movies = viewModel.movies
     }
     
@@ -74,14 +73,12 @@ class NowPlayingTVC: UITableViewController {
         if indexPath.section ==  lastSectionIndex && indexPath.row == lastRowIndex {
             if viewModel.isLoading == false {
                 viewModel.startLoading(view: tableView)
-                tableView.isUserInteractionEnabled = false
-                NetworkManager.shared.page += 1
-                viewModel.getNextPageOfMovies(methodRoot: getNowPlayingRoot, tableView: tableView)
+                viewModel.page += 1
+                viewModel.getNextPageOfMovies(tableView: tableView, endpoint: TMDBEndpoint.getNowPlayingMovies(page: viewModel.page))
                 movies += viewModel.movies
                 
                 DispatchQueue.main.async { [self] in
                     viewModel.stopLoading()
-                    tableView.isUserInteractionEnabled = true
                     tableView.reloadData()
                 }
             }

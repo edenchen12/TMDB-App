@@ -8,11 +8,9 @@
 import UIKit
 
 class PopularsTVC: UITableViewController {
-    
-    let getPopularRoot = "popular?api_key="
-    
-    var selectedMovie: MovieModel?
-    var movies: [MovieModel] = []
+        
+    var selectedMovie: TMDBMovie?
+    var movies: [TMDBMovie] = []
     
     let viewModel = TableViewModels()
     
@@ -24,8 +22,18 @@ class PopularsTVC: UITableViewController {
         navigationItem.title = "Populars"
         viewModel.setTableView(tableView: tableView)
         
-        viewModel.getMoviesToView(methodRoot: getPopularRoot, tableView: tableView)
+        viewModel.getMoviesToView(tableView: tableView, endpoint: TMDBEndpoint.getPopularsMovies(page: viewModel.page))
         movies = viewModel.movies
+        
+        //protocol network manager
+//        NetworkEngine.request(endpoint: TMDBEndpoint.getPopularsMovies(page: 1)) { (result: Result<TMDBResponse, Error>) in
+//            switch result {
+//            case .success(let success):
+//                print("Success Response From Protocol ", success)
+//            case .failure(let failure):
+//                    print("Failure Response From Protocol ", failure)
+//            }
+//        }
     }
     
     
@@ -78,14 +86,12 @@ class PopularsTVC: UITableViewController {
         if indexPath.section ==  lastSectionIndex && indexPath.row == lastRowIndex {
             if viewModel.isLoading == false {
                 viewModel.startLoading(view: tableView)
-                tableView.isUserInteractionEnabled = false
-                NetworkManager.shared.page += 1
-                viewModel.getNextPageOfMovies(methodRoot: getPopularRoot, tableView: tableView)
+                viewModel.page += 1
+                viewModel.getNextPageOfMovies(tableView: tableView, endpoint: TMDBEndpoint.getPopularsMovies(page: viewModel.page))
                 movies += viewModel.movies
                 
                 DispatchQueue.main.async { [self] in
                     viewModel.stopLoading()
-                    tableView.isUserInteractionEnabled = false
                     tableView.reloadData()
                 }
             }
